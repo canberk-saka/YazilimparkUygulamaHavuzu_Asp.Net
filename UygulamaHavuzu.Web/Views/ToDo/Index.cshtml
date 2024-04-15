@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+@model List<ToDoModel>
+
+<h2>To Do Listesi</h2>
+
+<form id="todoForm" asp-controller="ToDo" asp-action="Create" method="post">
+    <div class="form-group">
+        <input id="toDoEkle" class="form-control" placeholder="Yeni iş ekle" />
+        <span class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+
+<div id="todoList">
+    @if (Model.Count > 0)
+    {
+        <ul class="list-group">
+            @foreach (var item in Model)
+            {
+                <li class="list-group-item" data-id="@item.Id">
+                    @item.Description
+                    <input type="checkbox" onclick="toggleIsDone(@item.Id, this.checked)" @Html.Raw(item.IsDone ? "checked" : "")>
+                    <button class="btn btn-danger btn-sm float-right" onclick="deleteToDo(@item.Id)">Sil</button>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Henüz bir iş eklenmemiş.</p>
+    }
+</div>
+
+@section Scripts{
+    <script>
+        function toggleIsDone(todoId, isChecked) {
+            var formData = {
+                Id: todoId,
+                IsDone: isChecked
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("ToggleIsDone", "ToDo")",
+                data: formData,
+                success: function (data) {
+                    // İşlem başarılı olduğunda geri dönüş yapabilirsiniz
+                    $("li[data-id='" + todoId + "']").toggleClass("done", isChecked);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    // Hata oluştuğunda kullanıcıya bir hata mesajı gösterebilirsiniz
+                }
+            });
+        }
+
+        function deleteToDo(todoId) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "ToDo")",
+                data: { id: todoId },
+                success: function () {
+                    // İşlem başarılı olduğunda geri dönüş yapabilirsiniz
+                    // Silinen işi listeden kaldırın
+                    $("li[data-id='" + todoId + "']").remove();
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    // Hata oluştuğunda kullanıcıya bir hata mesajı gösterin
+                    alert("Hata oluştu: " + error.responseText);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Form submit olayını engelleyin ve AJAX işlemi yapın
+            $("#todoForm").submit(function (e) {
+                e.preventDefault();
+
+                // Formdaki verileri alın
+                var formData = {
+                    Description: $("#toDoEkle").val()
+                };
+
+                // AJAX POST isteği gönderin
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Create", "ToDo")",
+                    data: formData,
+                    success: function (data) {
+                        // Yeni eklenen veriyi listeye ekleyin
+                        var listItem = '<li class="list-group-item" data-id="' + data.id + '">' +
+                            data.description +
+                            '<input type="checkbox" onclick="toggleIsDone(' + data.id + ', this.checked)" ' +
+                            (data.isDone ? "checked" : "") + '>' +
+                            '<button class="btn btn-danger btn-sm float-right" onclick="deleteToDo(' + data.id + ')">Sil</button>' +
+                            '</li>';
+                        $("#todoList ul").append(listItem);
+
+                        // Form verilerini temizleyin
+                        $("#toDoEkle").val("");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                        // Hata oluştuğunda kullanıcıya bir hata mesajı gösterebilirsiniz
+                    }
+                });
+
+                return false; // Form submit işlemini engelle
+            });
+        });
+    </script>
+}

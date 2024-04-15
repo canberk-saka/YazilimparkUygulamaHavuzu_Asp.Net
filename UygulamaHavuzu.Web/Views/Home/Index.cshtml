@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model List<AppModel>
+
+    <h1 class="text-center">SBB Yazılım Park - Uygulama Havuzu</h1>
+
+
+<div class="row mb-2">
+    @foreach (var item in Model)
+    {
+
+        
+
+        <div class="col-md-3">
+
+            <div class="card" style="width: 18rem;">
+                <img src="@item.PhotoSource" alt="..." class="card-img-top" width="200" height="200">
+                <div class="card-body">
+                    <p class="card-text fw-bold fs-3">@item.Name</p>
+                    <p class="card-text">@item.Description</p>
+                    @switch (item.Name)
+                    {
+                        case "ToDo App":
+                            <a class = "btn btn-outline-primary mb-3" asp-controller="todo" asp-action="index"> Uygulamaya Git </a>
+                            break;
+                        case "Random Quotes":
+                            <a class="btn btn-outline-primary mb-3" asp-controller="randomQuotes" asp-action="index">Uygulamaya Git</a>
+                            break;
+                        case "Weather App":
+                            <a class="btn btn-outline-primary mb-3" asp-controller="weather" asp-action="index">Uygulamaya Git</a>
+                            break;
+                        case "BMI Calculator":
+                            <a class="btn btn-outline-primary mb-3" asp-controller="bmi" asp-action="index">Uygulamaya Git</a>
+                            break;
+                        default:
+                            <a href="#">Default Link</a>
+                            break;
+                    }
+
+
+                </div>
+            </div>
+        </div>
+
+        
+
+    
+
+    }
+</div>
+
+
+
+ 

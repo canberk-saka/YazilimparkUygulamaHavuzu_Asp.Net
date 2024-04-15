@@ -1,0 +1,63 @@
+﻿<!-- Views/Soz/Index.cshtml -->
+@model RandomQuotesModel
+
+<h1>Rastgele Özlü Söz Uygulaması</h1>
+
+<div>
+
+    <p id="ozluSoz"></p>
+    <p id="sozSahibi"></p>
+    <button id="tekrarBtn" class="btn btn-primary">Tekrar</button>
+    <a id="paylasBtn" class="btn btn-secondary" href="#">Twitter'da Paylaş</a>
+</div>
+
+@section Scripts {
+    <script>
+        function getRastgeleSoz() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("RastgeleSoz", "RandomQuotes")",
+                success: function (data) {
+                    $("#ozluSoz").text(data);
+                    
+                },
+                error: function () {
+                    alert("Özlü söz alınırken bir hata oluştu.");
+                }
+            });
+        }
+
+        function getSozSahibi() {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("SozYazari", "RandomQuotes")",
+                success: function (data) {
+                    $("#sozSahibi").text("-" + data);
+                    
+                },
+                error: function () {
+                    alert("Özlü söz alınırken bir hata oluştu.");
+                }
+            });
+        }
+
+
+        
+        $(document).ready(function () {
+            getRastgeleSoz();
+            getSozSahibi();
+        });
+
+        $("#tekrarBtn").click(function () {
+            getRastgeleSoz();
+            getSozSahibi();
+        });
+
+        $("#paylasBtn").click(function () {
+            var ozluSoz = $("#ozluSoz").text();
+            var twitterLink = "https://twitter.com/intent/tweet?hashtags=YazılımPark&text=" + encodeURIComponent(ozluSoz);
+            window.open(twitterLink, '_blank');
+        });
+    </script>
+}
+
